@@ -1,6 +1,8 @@
-// Inizializzazione variabili elementi
+// Inizializzazione variabili
 const app = document.getElementById("app");
 const play = document.getElementById("play");
+const bombNum = 16;
+let bombsArray = [];
 
 // Invocazione funzione creazione griglia
 play.addEventListener("click", createGrid);
@@ -9,6 +11,7 @@ play.addEventListener("click", createGrid);
 function createGrid() {
     const diff = parseInt(document.getElementById("diff").value);
     let numBox = Math.sqrt(diff);
+    createBombs(diff);
     app.innerHTML = "";
     for(let i = 1; i <= diff; i++) {
         const box = createBox(i, numBox);
@@ -33,7 +36,29 @@ function createBox(i, numBox) {
 
 //Funzione celle cliccabili
 function clickBox() {
-    this.style.backgroundColor = "#6495ED";
+    console.log(this.innerText)
+    if(bombsArray.includes(parseInt(this.innerText))) {
+        this.style.backgroundColor = "#DC143C";
+    } else {
+        this.style.backgroundColor = "#6495ED";
+    }
     this.classList.remove("pointer");
     this.removeEventListener("click", clickBox);
 }
+
+//Funzione creazione bombe
+function createBombs(diff) {
+    while(bombsArray.length < bombNum) {
+        let bomb = getRndInteger(1, diff);
+        if(!bombsArray.includes(bomb)) {
+            bombsArray.push(bomb);
+        }
+    }
+}
+
+
+// Funzioni generali
+// Estrazione numero casuale
+function getRndInteger(min, max) {
+    return Math.floor(Math.random() * (max - min + 1) ) + min;
+  }
