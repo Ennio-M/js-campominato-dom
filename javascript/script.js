@@ -1,15 +1,22 @@
 // Inizializzazione variabili
 const app = document.getElementById("app");
+const container = document.getElementById("container");
 const play = document.getElementById("play");
+const p = document.createElement("p");
+container.append(p);
+let diff = 0;
 const bombNum = 16;
 let bombsArray = [];
+let tries = 0;
 
 // Invocazione funzione creazione griglia
 play.addEventListener("click", createGrid);
 
 // Funzione creazione griglia
 function createGrid() {
-    const diff = parseInt(document.getElementById("diff").value);
+    tries = 0;
+    p.innerHTML = "";
+    diff = parseInt(document.getElementById("diff").value);
     let numBox = Math.sqrt(diff);
     createBombs(diff);
     app.innerHTML = "";
@@ -36,11 +43,22 @@ function createBox(i, numBox) {
 
 //Funzione celle cliccabili
 function clickBox() {
-    console.log(this.innerText)
     if(bombsArray.includes(parseInt(this.innerText))) {
         this.style.backgroundColor = "#DC143C";
+        revealBombs();
+        p.innerHTML = `Peccato, dopo ${tries} tentativi hai perso, <a href="#" id="again">ritenta</a>!`
+        const again = document.getElementById("again");
+        again.addEventListener("click", createGrid)
     } else {
         this.style.backgroundColor = "#6495ED";
+        tries++;
+        // controllo in caso il giocatore clicchi su tutte le celle senza bomba
+        if(tries === (diff - bombNum)) {
+            p.innerHTML = `Complimenti, hai vinto! <br> <a href="#" id="again">Ritenta</a>`
+            const again = document.getElementById("again");
+            again.addEventListener("click", createGrid)
+            revealBombs();
+        }
     }
     this.classList.remove("pointer");
     this.removeEventListener("click", clickBox);
@@ -48,6 +66,7 @@ function clickBox() {
 
 //Funzione creazione bombe
 function createBombs(diff) {
+    bombsArray = [];
     while(bombsArray.length < bombNum) {
         let bomb = getRndInteger(1, diff);
         if(!bombsArray.includes(bomb)) {
@@ -56,6 +75,18 @@ function createBombs(diff) {
     }
 }
 
+// Funzione rivelazione bombe
+function revealBombs() {
+    const boxes = document.querySelectorAll(".box");
+    for(let i = 0; i < boxes.length; i++) {
+        if(bombsArray.includes(parseInt(boxes[i].innerText))) {
+            boxes[i].style.backgroundColor = "#DC143C"
+            boxes[i].innerHTML = `<img src="./img/bomb.png" alt="Bomba">`
+        }
+        boxes[i].classList.remove("pointer");
+        boxes[i].removeEventListener("click", clickBox)
+    }
+}
 
 // Funzioni generali
 // Estrazione numero casuale
